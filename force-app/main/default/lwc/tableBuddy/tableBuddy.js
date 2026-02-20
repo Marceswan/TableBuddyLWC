@@ -62,8 +62,10 @@ export default class TableBuddy extends LightningElement {
   @api iconName;
 
   // Flow outputs
-  @api selectedRows = [];
-  @api firstSelectedRow = {};
+  @api selectedRowsJson = '';
+
+  // Internal selection tracking
+  selectedRows = [];
 
   // ---- Reactive tracked state ----
   tableData = [];
@@ -297,7 +299,7 @@ export default class TableBuddy extends LightningElement {
   @api
   resetTable() {
     this.selectedRows = [];
-    this.firstSelectedRow = {};
+    this.selectedRowsJson = '';
     this.tableData = [];
     this.tableColumns = [];
     this.draftValues = [];
@@ -796,12 +798,9 @@ export default class TableBuddy extends LightningElement {
       this.selectedRows = event.detail.selectedRows.map((row) =>
         this._getCleanRow(row)
       );
-      this.firstSelectedRow = this._getCleanRow(event.detail.selectedRows[0]);
+      this.selectedRowsJson = JSON.stringify(this.selectedRows);
       this.dispatchEvent(
-        new FlowAttributeChangeEvent('selectedRows', this.selectedRows)
-      );
-      this.dispatchEvent(
-        new FlowAttributeChangeEvent('firstSelectedRow', this.firstSelectedRow)
+        new FlowAttributeChangeEvent('selectedRowsJson', this.selectedRowsJson)
       );
     }
     // Publish for mass inline editing support

@@ -192,8 +192,9 @@ public inherited sharing class TableBuddyService {
       .get(objectName)
       .newSObject();
 
-    // Auto-add RecordTypeId if multi-type object
+    // Auto-add RecordTypeId if multi-type object (skip for aggregate queries)
     if (
+      !isAggregateQuery(queryString) &&
       recordTypeIdsForObject(objectName).size() > 1 &&
       !queryString.containsIgnoreCase('RecordTypeId')
     ) {

@@ -1,21 +1,38 @@
 <template>
   <lightning-modal-header label={modalHeader}></lightning-modal-header>
   <lightning-modal-body>
-    <template if:true={hasComponent}>
-      <lwc:component
-        lwc:is={_componentConstructor}
-        payload={actionPayload}
-        oncomplete={handleActionComplete}
-      >
-      </lwc:component>
-    </template>
-    <template if:false={hasComponent}>
-      <div class="slds-align_absolute-center slds-p-around_large">
-        <lightning-spinner alternative-text="Loading"></lightning-spinner>
-      </div>
-    </template>
+    <div class="slds-p-around_medium">
+      <p class="slds-text-body_regular slds-m-bottom_small">
+        Custom LWC Action: <strong>{lwcName}</strong>
+      </p>
+      <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_medium">
+        {payloadSummary}
+      </p>
+      <template lwc:if={hasSelectedRows}>
+        <div class="slds-m-bottom_small">
+          <p class="slds-text-title_caps slds-m-bottom_xx-small">
+            Selected Record IDs
+          </p>
+          <ul class="slds-list_dotted">
+            <template for:each={selectedRowIds} for:item="rowId">
+              <li key={rowId}>{rowId}</li>
+            </template>
+          </ul>
+        </div>
+      </template>
+      <p class="slds-text-body_small slds-text-color_weak">
+        To use custom LWC actions, enable Dynamic Components in your org and
+        update this modal.
+      </p>
+    </div>
   </lightning-modal-body>
   <lightning-modal-footer>
     <lightning-button label="Cancel" onclick={handleClose}></lightning-button>
+    <lightning-button
+      label="Done"
+      variant="brand"
+      onclick={handleComplete}
+      class="slds-m-left_x-small"
+    ></lightning-button>
   </lightning-modal-footer>
 </template>

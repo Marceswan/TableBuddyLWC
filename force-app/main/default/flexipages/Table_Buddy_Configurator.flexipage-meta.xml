@@ -4,6 +4,7 @@
         <itemInstances>
             <componentInstance>
                 <componentName>c:tableBuddyConfigurator</componentName>
+                <identifier>tableBuddyConfigurator</identifier>
             </componentInstance>
         </itemInstances>
         <name>main</name>

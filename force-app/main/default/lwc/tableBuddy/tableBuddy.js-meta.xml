@@ -48,15 +48,9 @@
         role="inputOnly"
       />
             <property
-        name="selectedRows"
-        label="Selected Rows"
-        type="{sobject[]}"
-        role="outputOnly"
-      />
-            <property
-        name="firstSelectedRow"
-        label="First Selected Row"
-        type="{sobject}"
+        name="selectedRowsJson"
+        label="Selected Rows JSON"
+        type="String"
         role="outputOnly"
       />
         </targetConfig>

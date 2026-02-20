@@ -7,26 +7,25 @@ export default class TableBuddyActionModal extends LightningModal {
   @api modalSize = 'large';
   @api actionPayload = {};
 
-  _componentConstructor;
-
-  async connectedCallback() {
-    if (this.lwcName) {
-      try {
-        // Dynamic import: lwcName should be like 'c/myComponent'
-        const module = await import(this.lwcName);
-        this._componentConstructor = module.default;
-      } catch (error) {
-        console.error('Failed to load component:', this.lwcName, error);
-      }
+  get payloadSummary() {
+    const rows = this.actionPayload?.selectedRows;
+    if (rows && rows.length) {
+      return `${rows.length} row(s) selected`;
     }
+    return 'No rows selected';
   }
 
-  get hasComponent() {
-    return !!this._componentConstructor;
+  get selectedRowIds() {
+    const rows = this.actionPayload?.selectedRows || [];
+    return rows.map((r) => r.Id).filter(Boolean);
   }
 
-  handleActionComplete(event) {
-    this.close({ status: 'completed', result: event.detail });
+  get hasSelectedRows() {
+    return this.selectedRowIds.length > 0;
+  }
+
+  handleComplete() {
+    this.close({ status: 'completed', result: this.actionPayload });
   }
 
   handleClose() {
