@@ -101,9 +101,175 @@ These options are configured in the configurator and stored in the config JSON:
 
 ### Action Configuration
 
-- **Table Actions** — Buttons rendered in the card header. Each action can launch a Flow or custom LWC.
-- **Overflow Actions** — Additional actions rendered in a button menu dropdown.
-- **Row Actions** — Per-row dropdown actions. Includes built-in Edit Row and Delete Row, plus custom Flow or LWC actions.
+Table Buddy supports three categories of actions, all configured through the configurator UI:
+
+- **Table Actions** — Buttons rendered in the card header (or page-header toolbar in related list mode). These operate on the table as a whole or on selected rows.
+- **Overflow Actions** — Additional actions rendered in a dropdown button menu next to the table actions. Identical in capability to table actions, but kept in a menu to reduce toolbar clutter.
+- **Row Actions** — Per-row dropdown actions that appear in the last column of each row.
+
+Each action has the following properties:
+
+| Property          | Description                                                    |
+| ----------------- | -------------------------------------------------------------- |
+| **Label**         | Button or menu item text displayed to the user.                |
+| **Type**          | `Flow`, `LWC`, or `Built-in` (row actions only).               |
+| **Flow API Name** | The API name of the Screen Flow to launch (when type is Flow). |
+| **LWC Name**      | The component name to load dynamically (when type is LWC).     |
+| **Dialog Size**   | `Small`, `Medium`, or `Large` — controls the modal width.      |
+| **Order**         | Numeric position controlling display order.                    |
+
+Row actions additionally support a **Name** field (the action identifier) and two built-in types: `edit_row` and `delete_row`.
+
+---
+
+## Configuring Flow Actions
+
+### Setup Steps
+
+1. **Create a Screen Flow** in Salesforce Setup.
+2. **Declare input variables** the Flow needs (all are optional — declare only what you use):
+
+| Variable Name      | Type               | Description                                                                                                                |
+| ------------------ | ------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| `SelectedRows`     | SObject Collection | All selected rows (multi-select) or the single row context (row action).                                                   |
+| `FirstSelectedRow` | SObject (single)   | The first row in the selection, or the row the action was triggered on.                                                    |
+| `UniqueBoundary`   | Text (String)      | UUID identifying this specific Table Buddy instance. Used to send messages back via the Lightning Message Service channel. |
+| `SourceRecordId`   | Text (String)      | The `recordId` of the page the table is placed on (Record Pages only).                                                     |
+
+3. **Add the action in the configurator:**
+   - For table/overflow actions: go to the Actions section, click Add Table Action (or Add Overflow Action), set the type to `Flow`, and enter the Flow's API name.
+   - For row actions: click Add Row Action, set the type to `Flow`, and enter the Flow's API name.
+4. **Save the config.**
+
+### Flow Completion Behavior
+
+- When the Flow finishes with status `FINISHED` or `FINISHED_SCREEN`, Table Buddy **automatically refreshes** the table data.
+- If the user closes the modal or the Flow is cancelled, no refresh occurs.
+- Flow `outputVariables` are returned but not currently consumed by the runtime — they are available for future extensibility.
+
+### Example: Row-Level Flow Action
+
+A Flow that creates a follow-up Task for a selected Account:
+
+1. Declare input variable `FirstSelectedRow` (SObject, Account).
+2. In the Flow, use `{!FirstSelectedRow.Id}` and `{!FirstSelectedRow.Name}` to reference the row.
+3. Create the Task record, end with a Screen or just finish.
+4. In the configurator, add a Row Action with type `Flow`, label "Create Follow-Up", and the Flow API name.
+
+---
+
+## Configuring Custom LWC Actions
+
+### Setup Steps
+
+1. **Create a Lightning Web Component** in your project.
+2. **Declare the `actionPayload` API property** — this is the only required contract:
+
+```javascript
+import { api } from 'lwc';
+
+export default class MyCustomAction extends LightningElement {
+  @api actionPayload = {};
+}
+```
+
+The `actionPayload` object contains:
+
+| Property         | Type   | Description                                                                                              |
+| ---------------- | ------ | -------------------------------------------------------------------------------------------------------- |
+| `selectedRows`   | Array  | All selected rows, or a single-element array containing the row the action was triggered on.             |
+| `sourceRecordId` | String | The `recordId` of the page the table is placed on (Record Pages only).                                   |
+| `uniqueBoundary` | String | UUID identifying this Table Buddy instance, for sending messages back via the Lightning Message Channel. |
+
+3. **Add the action in the configurator:**
+   - Set the type to `LWC` and enter the component name (e.g. `c-my-custom-action` becomes `c/myCustomAction` internally — enter the camelCase name as shown in the configurator).
+4. **Save the config.**
+
+### Closing the Modal and Triggering Refresh
+
+Your custom LWC is rendered inside a `lightning-modal`. To close it:
+
+```javascript
+// Signal completion — Table Buddy will refresh the table
+this.dispatchEvent(new CustomEvent('complete'));
+
+// Signal cancellation — no refresh
+this.dispatchEvent(new CustomEvent('close'));
+```
+
+The parent `tableBuddyActionModal` listens for these events:
+
+- `complete` → closes the modal with `{ status: 'completed' }` → **triggers table refresh**.
+- `close` → closes the modal with `{ status: 'cancelled' }` → **no refresh**.
+
+### Example: Custom LWC Row Action
+
+```javascript
+import { LightningElement, api } from 'lwc';
+
+export default class QuickNoteAction extends LightningElement {
+  @api actionPayload = {};
+
+  get selectedRow() {
+    return this.actionPayload?.selectedRows?.[0];
+  }
+
+  get recordId() {
+    return this.selectedRow?.Id;
+  }
+
+  handleSave() {
+    // ... your logic ...
+    this.dispatchEvent(new CustomEvent('complete'));
+  }
+
+  handleCancel() {
+    this.dispatchEvent(new CustomEvent('close'));
+  }
+}
+```
+
+---
+
+## Built-in Row Actions
+
+Two built-in row actions are available without any additional setup:
+
+### Edit Row (`edit_row`)
+
+- Opens a `lightning-record-edit-form` modal pre-populated with the selected record.
+- Only fields marked as **Editable** in the configurator's field list are shown in the form.
+- On successful save, the table refreshes automatically.
+
+### Delete Row (`delete_row`)
+
+- Opens a confirmation modal displaying the record name (falls back to `CaseNumber` or `Id`).
+- On confirmation, deletes the record via `lightning/uiRecordApi.deleteRecord`.
+- On successful deletion, the table refreshes automatically.
+
+To add these in the configurator: Add a Row Action, set the type to `Built-in`, and select `edit_row` or `delete_row`.
+
+---
+
+## Table Refresh via Lightning Message Service
+
+For advanced scenarios where a custom component (LWC or Flow-launched LWC) needs to trigger a Table Buddy refresh programmatically, the `UniqueBoundary` / `uniqueBoundary` value is provided for exactly this purpose.
+
+Table Buddy uses a Lightning Message Channel (`TableBuddyChannel__c`) scoped by a unique boundary UUID. Publishing a message with the key `refreshtablebuddy` on that boundary will trigger a refresh:
+
+```javascript
+import { publish, MessageContext } from 'lightning/messageService';
+import TABLE_BUDDY_CHANNEL from '@salesforce/messageChannel/TableBuddyChannel__c';
+
+// Inside your custom component:
+publish(this.messageContext, TABLE_BUDDY_CHANNEL, {
+  boundary: this.actionPayload.uniqueBoundary,
+  key: 'refreshtablebuddy',
+  value: ''
+});
+```
+
+This is optional — for most use cases, simply closing the modal with `complete` or finishing a Flow is sufficient to trigger a refresh.
 
 ### Lookup Configuration
 
