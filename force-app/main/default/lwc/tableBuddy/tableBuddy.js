@@ -62,6 +62,9 @@ export default class TableBuddy extends LightningElement {
   @api iconName;
   @api visibleFieldNames = [];
   @api previewFieldConfigs = [];
+  @api previewShowSearch = false;
+  @api previewShowRefresh = false;
+  @api previewShowRecordCount = false;
 
   // Flow outputs
   @api selectedRowsJson = '';
@@ -135,7 +138,15 @@ export default class TableBuddy extends LightningElement {
   }
 
   get showRecordCount() {
-    return this._showRecordCount;
+    return this._showRecordCount || this.previewShowRecordCount;
+  }
+
+  get showSearch() {
+    return this._showSearch || this.previewShowSearch;
+  }
+
+  get showRefresh() {
+    return this._showRefresh || this.previewShowRefresh;
   }
 
   get recordCountDisplay() {
@@ -534,7 +545,7 @@ export default class TableBuddy extends LightningElement {
     this._setTableData(data);
     this._clearDraftValuesOnSuccess();
 
-    if (this._showSearch) {
+    if (this.showSearch) {
       this._prepGlobalSearch();
     }
 
@@ -571,11 +582,14 @@ export default class TableBuddy extends LightningElement {
         continue;
       }
 
-      // Only render columns that the user explicitly selected;
+      // Only render columns the user marked visible in the config;
       // auto-injected fields (e.g. Id) are queried but not displayed
-      // unless the user chose them.
-      if (fieldConfigMap.size > 0 && !fieldConfigMap.has(col.fieldName)) {
-        continue;
+      // unless the user explicitly selected them.
+      if (fieldConfigMap.size > 0) {
+        const cfg = fieldConfigMap.get(col.fieldName);
+        if (!cfg || cfg.visible === false) {
+          continue;
+        }
       }
       if (
         fieldConfigMap.size === 0 &&

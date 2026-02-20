@@ -46,7 +46,7 @@
         pull-to-boundary="small"
       >
         <!-- Search -->
-        <template lwc:if={_showSearch}>
+        <template lwc:if={showSearch}>
           <lightning-layout-item class="slds-p-right_x-small">
             <lightning-input
               class="search-input"
@@ -58,7 +58,7 @@
         </template>
 
         <!-- Refresh -->
-        <template lwc:if={_showRefresh}>
+        <template lwc:if={showRefresh}>
           <lightning-layout-item>
             <lightning-button-icon
               alternative-text="Refresh"
