@@ -60,6 +60,7 @@ export default class TableBuddy extends LightningElement {
   @api configName;
   @api title;
   @api iconName;
+  @api isUsedAsRelatedList = false;
   @api visibleFieldNames = [];
   @api previewFieldConfigs = [];
   @api previewShowSearch = false;
@@ -156,13 +157,7 @@ export default class TableBuddy extends LightningElement {
   }
 
   get containerClass() {
-    return [
-      'slds-border_top',
-      'slds-border_bottom',
-      'slds-border_left',
-      'slds-border_right',
-      'slds-is-relative'
-    ].join(' ');
+    return 'slds-is-relative';
   }
 
   get extensionBoundaryClass() {
@@ -381,6 +376,7 @@ export default class TableBuddy extends LightningElement {
     this._showSearch = displaySettings.showSearch === true;
     this._showRefresh = displaySettings.showRefresh === true;
     this._showRecordCount = displaySettings.showRecordCount === true;
+    this.isUsedAsRelatedList = displaySettings.isUsedAsRelatedList === true;
     this._editableFieldsSet = new Set(displaySettings.editableFields || []);
 
     // Checkbox type

@@ -4,104 +4,232 @@
     onrefreshtablebuddy={handleMessageRefresh}
   ></c-table-buddy-message-service>
 
-  <lightning-card icon-name={computedIconName}>
-    <div slot="title">
-      <template lwc:if={showRecordCount}>
-        {title} {recordCountDisplay}
-      </template>
-      <template lwc:else>{title}</template>
-    </div>
-
-    <div class={containerClass}>
-      <template lwc:if={_showSpinner}>
-        <lightning-spinner alternative-text="Loading"></lightning-spinner>
-      </template>
-
-      <c-table-buddy-datatable
-        class={extensionBoundaryClass}
-        key-field="Id"
-        show-row-number-column={_isShowRowNumber}
-        hide-checkbox-column={_isHideCheckbox}
-        max-row-selection={_maxRowSelection}
-        data={tableData}
-        columns={tableColumns}
-        column-widths-mode="auto"
-        onrowselection={handleRowSelection}
-        onrowaction={handleRowAction}
-        onsort={handleColumnSorting}
-        sorted-by={_sortedBy}
-        sorted-direction={_sortedDirection}
-        draft-values={draftValues}
-        oncellchange={handleCellChange}
-        oncancel={handleCancel}
-        onsave={handleSave}
-        errors={saveErrors}
-      ></c-table-buddy-datatable>
-    </div>
-
-    <div slot="actions">
-      <lightning-layout
-        horizontal-align="end"
-        vertical-align="end"
-        pull-to-boundary="small"
-      >
-        <!-- Search -->
-        <template lwc:if={showSearch}>
-          <lightning-layout-item class="slds-p-right_x-small">
-            <lightning-input
-              class="search-input"
-              variant="label-hidden"
-              placeholder="Search..."
-              onchange={handleSearch}
-            ></lightning-input>
-          </lightning-layout-item>
-        </template>
-
-        <!-- Refresh -->
-        <template lwc:if={showRefresh}>
-          <lightning-layout-item>
-            <lightning-button-icon
-              alternative-text="Refresh"
-              icon-name="utility:refresh"
-              onclick={handleRefresh}
-            ></lightning-button-icon>
-          </lightning-layout-item>
-        </template>
-
-        <!-- Table Actions -->
-        <template lwc:if={_hasTableActions}>
-          <lightning-layout-item class="slds-p-left_x-small slds-p-right_small">
-            <lightning-button-group>
-              <template for:each={_tableActions} for:item="action">
-                <lightning-button
-                  key={action.label}
-                  data-action-index={action.order}
-                  label={action.label}
-                  onclick={handleTableAction}
-                ></lightning-button>
+  <!-- ===== Related List layout ===== -->
+  <template lwc:if={isUsedAsRelatedList}>
+    <div
+      class="slds-page-header slds-page-header_record-home page-header slds-p-bottom_none"
+    >
+      <div class="slds-page-header__row slds-m-bottom_small">
+        <div class="slds-page-header__col-title">
+          <div class="slds-media">
+            <div class="slds-media__figure">
+              <template lwc:if={computedIconName}>
+                <span class="slds-icon_container">
+                  <lightning-icon
+                    icon-name={computedIconName}
+                    alternative-text={title}
+                    title={title}
+                    size="small"
+                  ></lightning-icon>
+                </span>
               </template>
+            </div>
+            <div class="slds-media__body">
+              <h2 class="slds-card__header-title">
+                <template lwc:if={showRecordCount}>
+                  {title} {recordCountDisplay}
+                </template>
+                <template lwc:else>{title}</template>
+              </h2>
+            </div>
+          </div>
+        </div>
 
-              <template lwc:if={_hasOverflowActions}>
-                <lightning-button-menu
-                  alternative-text="Additional Actions"
-                  class="slds-button_last"
-                >
-                  <template for:each={_overflowActions} for:item="overflow">
-                    <lightning-menu-item
-                      key={overflow.label}
-                      data-action-index={overflow.order}
-                      label={overflow.label}
-                      onclick={handleOverflowAction}
-                    ></lightning-menu-item>
+        <div class="slds-page-header__col-actions">
+          <div class="slds-page-header__controls">
+            <div class="slds-page-header__control">
+              <!-- Search -->
+              <template lwc:if={showSearch}>
+                <lightning-input
+                  class="search-input"
+                  variant="label-hidden"
+                  placeholder="Search..."
+                  onchange={handleSearch}
+                ></lightning-input>
+              </template>
+              <!-- Refresh -->
+              <template lwc:if={showRefresh}>
+                <lightning-button-icon
+                  alternative-text="Refresh"
+                  icon-name="utility:refresh"
+                  variant="border-filled"
+                  onclick={handleRefresh}
+                ></lightning-button-icon>
+              </template>
+              <!-- Table Actions -->
+              <template lwc:if={_hasTableActions}>
+                <lightning-button-group>
+                  <template for:each={_tableActions} for:item="action">
+                    <lightning-button
+                      key={action.label}
+                      data-action-index={action.order}
+                      label={action.label}
+                      onclick={handleTableAction}
+                    ></lightning-button>
                   </template>
-                </lightning-button-menu>
+                  <template lwc:if={_hasOverflowActions}>
+                    <lightning-button-menu
+                      alternative-text="Additional Actions"
+                      class="slds-button_last"
+                    >
+                      <template for:each={_overflowActions} for:item="overflow">
+                        <lightning-menu-item
+                          key={overflow.label}
+                          data-action-index={overflow.order}
+                          label={overflow.label}
+                          onclick={handleOverflowAction}
+                        ></lightning-menu-item>
+                      </template>
+                    </lightning-button-menu>
+                  </template>
+                </lightning-button-group>
               </template>
-            </lightning-button-group>
-          </lightning-layout-item>
-        </template>
-      </lightning-layout>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="slds-page-header__row slds-page-header__row_gutters">
+        <div class="slds-page-header__col-details">
+          <ul
+            class="slds-page-header__detail-row slds-p-around_none page-header-detail"
+          >
+            <div class={containerClass}>
+              <template lwc:if={_showSpinner}>
+                <lightning-spinner
+                  alternative-text="Loading"
+                ></lightning-spinner>
+              </template>
+              <c-table-buddy-datatable
+                class={extensionBoundaryClass}
+                key-field="Id"
+                show-row-number-column={_isShowRowNumber}
+                hide-checkbox-column={_isHideCheckbox}
+                max-row-selection={_maxRowSelection}
+                data={tableData}
+                columns={tableColumns}
+                column-widths-mode="auto"
+                onrowselection={handleRowSelection}
+                onrowaction={handleRowAction}
+                onsort={handleColumnSorting}
+                sorted-by={_sortedBy}
+                sorted-direction={_sortedDirection}
+                draft-values={draftValues}
+                oncellchange={handleCellChange}
+                oncancel={handleCancel}
+                onsave={handleSave}
+                errors={saveErrors}
+              ></c-table-buddy-datatable>
+            </div>
+          </ul>
+        </div>
+      </div>
     </div>
-  </lightning-card>
+  </template>
+
+  <!-- ===== Standard Card layout ===== -->
+  <template lwc:else>
+    <lightning-card icon-name={computedIconName}>
+      <div slot="title">
+        <template lwc:if={showRecordCount}>
+          {title} {recordCountDisplay}
+        </template>
+        <template lwc:else>{title}</template>
+      </div>
+
+      <div class={containerClass}>
+        <template lwc:if={_showSpinner}>
+          <lightning-spinner alternative-text="Loading"></lightning-spinner>
+        </template>
+
+        <c-table-buddy-datatable
+          class={extensionBoundaryClass}
+          key-field="Id"
+          show-row-number-column={_isShowRowNumber}
+          hide-checkbox-column={_isHideCheckbox}
+          max-row-selection={_maxRowSelection}
+          data={tableData}
+          columns={tableColumns}
+          column-widths-mode="auto"
+          onrowselection={handleRowSelection}
+          onrowaction={handleRowAction}
+          onsort={handleColumnSorting}
+          sorted-by={_sortedBy}
+          sorted-direction={_sortedDirection}
+          draft-values={draftValues}
+          oncellchange={handleCellChange}
+          oncancel={handleCancel}
+          onsave={handleSave}
+          errors={saveErrors}
+        ></c-table-buddy-datatable>
+      </div>
+
+      <div slot="actions">
+        <lightning-layout
+          horizontal-align="end"
+          vertical-align="end"
+          pull-to-boundary="small"
+        >
+          <!-- Search -->
+          <template lwc:if={showSearch}>
+            <lightning-layout-item class="slds-p-right_x-small">
+              <lightning-input
+                class="search-input"
+                variant="label-hidden"
+                placeholder="Search..."
+                onchange={handleSearch}
+              ></lightning-input>
+            </lightning-layout-item>
+          </template>
+
+          <!-- Refresh -->
+          <template lwc:if={showRefresh}>
+            <lightning-layout-item>
+              <lightning-button-icon
+                alternative-text="Refresh"
+                icon-name="utility:refresh"
+                onclick={handleRefresh}
+              ></lightning-button-icon>
+            </lightning-layout-item>
+          </template>
+
+          <!-- Table Actions -->
+          <template lwc:if={_hasTableActions}>
+            <lightning-layout-item
+              class="slds-p-left_x-small slds-p-right_small"
+            >
+              <lightning-button-group>
+                <template for:each={_tableActions} for:item="action">
+                  <lightning-button
+                    key={action.label}
+                    data-action-index={action.order}
+                    label={action.label}
+                    onclick={handleTableAction}
+                  ></lightning-button>
+                </template>
+
+                <template lwc:if={_hasOverflowActions}>
+                  <lightning-button-menu
+                    alternative-text="Additional Actions"
+                    class="slds-button_last"
+                  >
+                    <template for:each={_overflowActions} for:item="overflow">
+                      <lightning-menu-item
+                        key={overflow.label}
+                        data-action-index={overflow.order}
+                        label={overflow.label}
+                        onclick={handleOverflowAction}
+                      ></lightning-menu-item>
+                    </template>
+                  </lightning-button-menu>
+                </template>
+              </lightning-button-group>
+            </lightning-layout-item>
+          </template>
+        </lightning-layout>
+      </div>
+    </lightning-card>
+  </template>
 
   <!-- Error display when no config -->
   <template lwc:if={_configError}>

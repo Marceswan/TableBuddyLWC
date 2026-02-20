@@ -45,6 +45,7 @@ export default class TableBuddyConfigurator extends LightningElement {
   showRecordCount = false;
   showSearch = false;
   showRefresh = false;
+  isUsedAsRelatedList = false;
 
   // ---- Context Record ----
   contextObjectApiName = '';
@@ -378,6 +379,7 @@ export default class TableBuddyConfigurator extends LightningElement {
     this.showRecordCount = false;
     this.showSearch = false;
     this.showRefresh = false;
+    this.isUsedAsRelatedList = false;
     this.checkboxType = 'None';
     this.tableActions = [];
     this.overflowActions = [];
@@ -968,6 +970,10 @@ export default class TableBuddyConfigurator extends LightningElement {
     this.showRefresh = event.target.checked;
   }
 
+  handleIsUsedAsRelatedListChange(event) {
+    this.isUsedAsRelatedList = event.target.checked;
+  }
+
   // ===================== CONTEXT RECORD =====================
 
   handleContextObjectSearch(event) {
@@ -1104,6 +1110,7 @@ export default class TableBuddyConfigurator extends LightningElement {
           showRecordCount: this.showRecordCount,
           showSearch: this.showSearch,
           showRefresh: this.showRefresh,
+          isUsedAsRelatedList: this.isUsedAsRelatedList,
           checkboxType: this.checkboxType,
           editableFields: this.fields
             .filter((f) => f.visible && f.editable)
@@ -1236,6 +1243,7 @@ export default class TableBuddyConfigurator extends LightningElement {
     this.showRecordCount = ds.showRecordCount || false;
     this.showSearch = ds.showSearch || false;
     this.showRefresh = ds.showRefresh || false;
+    this.isUsedAsRelatedList = ds.isUsedAsRelatedList || false;
     this.checkboxType = ds.checkboxType || 'None';
 
     // Restore actions

@@ -1,6 +1,29 @@
 :host {
   display: block;
 }
+
+/* Standard card layout */
+lightning-card .slds-card {
+  border: 1px solid #c9c9c9;
+  border-radius: 0.25rem;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+}
+
+lightning-card .slds-card__body {
+  padding: 0;
+  margin: 0 0.75rem 0.75rem;
+}
+
+/* Related list layout */
+div.page-header {
+  border: var(--lwc-borderWidthThin, 1px) solid rgb(201, 201, 201);
+}
+
+ul.page-header-detail {
+  border-top: var(--lwc-borderWidthThin, 1px) solid rgb(201, 201, 201);
+}
+
 .slds-is-relative {
   position: relative;
 }
