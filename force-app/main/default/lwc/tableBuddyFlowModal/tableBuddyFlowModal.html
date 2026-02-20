@@ -1,0 +1,13 @@
+<template>
+  <lightning-modal-header label={modalHeader}></lightning-modal-header>
+  <lightning-modal-body>
+    <lightning-flow
+      flow-api-name={flowApiName}
+      flow-input-variables={inputVariables}
+      onstatuschange={handleFlowStatusChange}
+    ></lightning-flow>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button label="Cancel" onclick={handleClose}></lightning-button>
+  </lightning-modal-footer>
+</template>

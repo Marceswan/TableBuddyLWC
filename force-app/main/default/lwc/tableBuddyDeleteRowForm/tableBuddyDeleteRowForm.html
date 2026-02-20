@@ -1,0 +1,30 @@
+<template>
+  <lightning-modal-header label={modalHeader}></lightning-modal-header>
+  <lightning-modal-body>
+    <div class="slds-p-around_medium">
+      <p class="slds-text-body_regular">{confirmMessage}</p>
+      <template if:true={hasError}>
+        <div
+          class="slds-notify slds-notify_alert slds-alert_error slds-m-top_medium"
+          role="alert"
+        >
+          <span class="slds-assistive-text">error</span>
+          <h2>{_error}</h2>
+        </div>
+      </template>
+    </div>
+  </lightning-modal-body>
+  <lightning-modal-footer>
+    <lightning-button
+      label="Cancel"
+      onclick={handleClose}
+      class="slds-m-right_x-small"
+    ></lightning-button>
+    <lightning-button
+      label="Delete"
+      variant="destructive"
+      onclick={handleDelete}
+      disabled={_isDeleting}
+    ></lightning-button>
+  </lightning-modal-footer>
+</template>
