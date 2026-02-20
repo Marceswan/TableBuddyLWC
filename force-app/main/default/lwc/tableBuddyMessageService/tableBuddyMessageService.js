@@ -1,25 +1,25 @@
-import { LightningElement, api, wire } from "lwc";
+import { LightningElement, api, wire } from 'lwc';
 import {
   subscribe,
   unsubscribe,
   publish,
   MessageContext
-} from "lightning/messageService";
-import TABLE_BUDDY_CHANNEL from "@salesforce/messageChannel/TableBuddyChannel__c";
-import { ShowToastEvent } from "lightning/platformShowToastEvent";
+} from 'lightning/messageService';
+import TABLE_BUDDY_CHANNEL from '@salesforce/messageChannel/TableBuddyChannel__c';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
 // ── Inline Utility Functions ──────────────────────────────────────────────────
 
 const generateUUID = () => {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     var r = (Math.random() * 16) | 0,
-      v = c === "x" ? r : (r & 0x3) | 0x8;
+      v = c === 'x' ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 };
 
 const isRecordId = (string) => {
-  const re = new RegExp("[a-zA-Z0-9]{15}|[a-zA-Z0-9]{18}");
+  const re = new RegExp('[a-zA-Z0-9]{15}|[a-zA-Z0-9]{18}');
   return !!string?.match(re);
 };
 
@@ -35,13 +35,13 @@ const reduceErrors = (errors) => {
       } else if (
         error.body &&
         error.body.enhancedErrorType &&
-        error.body.enhancedErrorType.toLowerCase() === "recorderror" &&
+        error.body.enhancedErrorType.toLowerCase() === 'recorderror' &&
         error.body.output
       ) {
-        let firstError = "";
+        let firstError = '';
         if (
           error.body.output.errors.length &&
-          error.body.output.errors[0].errorCode.includes("_")
+          error.body.output.errors[0].errorCode.includes('_')
         ) {
           firstError = error.body.output.errors[0].message;
         }
@@ -52,9 +52,9 @@ const reduceErrors = (errors) => {
             ][0].message;
         }
         return firstError;
-      } else if (error.body && typeof error.body.message === "string") {
+      } else if (error.body && typeof error.body.message === 'string') {
         let errorMessage = error.body.message;
-        if (typeof error.body.stackTrace === "string") {
+        if (typeof error.body.stackTrace === 'string') {
           errorMessage += `\n${error.body.stackTrace}`;
         }
         return errorMessage;
@@ -64,7 +64,7 @@ const reduceErrors = (errors) => {
         error.body.pageErrors.length
       ) {
         return error.body.pageErrors[0].message;
-      } else if (typeof error.message === "string") {
+      } else if (typeof error.message === 'string') {
         return error.message;
       }
       return error.statusText;
@@ -128,18 +128,18 @@ export default class TableBuddyMessageService extends LightningElement {
 
   @api
   notifyClose() {
-    this._publishOpen({ key: "closedialog" });
+    this._publishOpen({ key: 'closedialog' });
   }
 
   @api
   notifyBoundaryClose() {
-    this._publishWithBoundary({ key: "closedialog" });
+    this._publishWithBoundary({ key: 'closedialog' });
   }
 
   @api
   openModal(payload) {
     this.dispatchEvent(
-      new CustomEvent("openmodal", { detail: { value: payload } })
+      new CustomEvent('openmodal', { detail: { value: payload } })
     );
   }
 
@@ -149,7 +149,7 @@ export default class TableBuddyMessageService extends LightningElement {
       new ShowToastEvent({
         title: title,
         message: message,
-        variant: "success"
+        variant: 'success'
       })
     );
   }
@@ -160,19 +160,19 @@ export default class TableBuddyMessageService extends LightningElement {
       new ShowToastEvent({
         title: title,
         message: message,
-        variant: "info"
+        variant: 'info'
       })
     );
   }
 
   @api
-  notifySingleError(title, error = "") {
+  notifySingleError(title, error = '') {
     this.dispatchEvent(
       new ShowToastEvent({
         title: title,
         message: reduceErrors(error)[0],
-        variant: "error",
-        mode: "sticky"
+        variant: 'error',
+        mode: 'sticky'
       })
     );
   }
@@ -219,7 +219,7 @@ export default class TableBuddyMessageService extends LightningElement {
   }
 
   _hasBoundaryProp(payload) {
-    return Object.prototype.hasOwnProperty.call(payload, "boundary");
+    return Object.prototype.hasOwnProperty.call(payload, 'boundary');
   }
 
   _isBoundaryRecordId(boundary) {
