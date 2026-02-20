@@ -1,0 +1,120 @@
+:host {
+  display: block;
+}
+
+.slds-card {
+  border: 1px solid #d8dde6;
+  border-radius: 4px;
+}
+
+.field-filter-combo {
+  max-width: 180px;
+}
+
+.drag-handle-cell {
+  cursor: grab;
+  text-align: center;
+  color: #b0adab;
+}
+
+.field-row[draggable='true']:hover .drag-handle-cell {
+  color: #706e6b;
+}
+
+.field-row-dragging {
+  opacity: 0.4;
+}
+
+.field-row-drop-above {
+  box-shadow: inset 0 2px 0 0 #0070d2;
+}
+
+.field-row-drop-below {
+  box-shadow: inset 0 -2px 0 0 #0070d2;
+}
+
+.object-search-container {
+  position: relative;
+}
+
+.object-search-dropdown {
+  position: absolute;
+  z-index: 9001;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #d8dde6;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.16);
+}
+
+.object-search-dropdown .slds-listbox__option:hover {
+  background-color: #f3f3f3;
+  cursor: pointer;
+}
+
+.context-object-search {
+  position: relative;
+}
+
+.context-object-dropdown {
+  position: absolute;
+  z-index: 9001;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #d8dde6;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.16);
+}
+
+.context-object-dropdown .slds-listbox__option:hover {
+  background-color: #f3f3f3;
+  cursor: pointer;
+}
+
+/* Advanced field expand */
+.field-advanced-row td {
+  padding: 0.5rem 0.75rem;
+  background-color: #f7f9fb;
+}
+
+/* Action rows */
+.action-row {
+  border-bottom: 1px solid #e5e5e5;
+  padding: 0.5rem 0;
+}
+
+/* Section headers */
+.section-header {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #3e3e3c;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e5e5e5;
+  margin-bottom: 0.5rem;
+}
+
+/* Field type badge */
+.field-type-badge {
+  font-size: 0.65rem;
+  padding: 0.1rem 0.35rem;
+  vertical-align: middle;
+}
+
+/* Field API name */
+.field-api-name {
+  font-size: 0.8125rem;
+}
+
+/* Query preview text */
+.query-preview {
+  word-break: break-all;
+  font-family: 'SF Mono', 'Courier New', monospace;
+  font-size: 0.75rem;
+  background-color: #f3f3f3;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
