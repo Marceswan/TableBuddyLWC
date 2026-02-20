@@ -60,6 +60,8 @@ export default class TableBuddy extends LightningElement {
   @api configName;
   @api title;
   @api iconName;
+  @api visibleFieldNames = [];
+  @api previewFieldConfigs = [];
 
   // Flow outputs
   @api selectedRowsJson = '';
@@ -294,6 +296,23 @@ export default class TableBuddy extends LightningElement {
       this._notifySingleError('Refresh Error', error);
       this._showSpinner = false;
     }
+  }
+
+  @api
+  updateColumnLabels(fieldConfigs) {
+    if (!this.tableColumns || !this.tableColumns.length || !fieldConfigs) {
+      return;
+    }
+    const labelMap = new Map(
+      fieldConfigs.map((f) => [f.fieldName.replace('.', '_'), f.label])
+    );
+    this.tableColumns = this.tableColumns.map((col) => {
+      const newLabel = labelMap.get(col.fieldName);
+      if (newLabel !== undefined && newLabel !== col.label) {
+        return { ...col, label: newLabel };
+      }
+      return col;
+    });
   }
 
   @api
@@ -537,7 +556,11 @@ export default class TableBuddy extends LightningElement {
       return;
     }
     const finalColumns = [];
-    const configFields = this._parsedConfig ? this._parsedConfig.fields : [];
+    const configFields = this._parsedConfig
+      ? this._parsedConfig.fields
+      : this.previewFieldConfigs && this.previewFieldConfigs.length
+        ? this.previewFieldConfigs
+        : [];
     const fieldConfigMap = new Map(
       configFields.map((f) => [f.fieldName.replace('.', '_'), f])
     );
@@ -545,6 +568,21 @@ export default class TableBuddy extends LightningElement {
     for (let col of tableColumns) {
       // Skip auto-queried RecordTypeId
       if (col.fieldName.toLowerCase() === 'recordtypeid') {
+        continue;
+      }
+
+      // Only render columns that the user explicitly selected;
+      // auto-injected fields (e.g. Id) are queried but not displayed
+      // unless the user chose them.
+      if (fieldConfigMap.size > 0 && !fieldConfigMap.has(col.fieldName)) {
+        continue;
+      }
+      if (
+        fieldConfigMap.size === 0 &&
+        this.visibleFieldNames &&
+        this.visibleFieldNames.length > 0 &&
+        !this.visibleFieldNames.includes(col.fieldName)
+      ) {
         continue;
       }
 

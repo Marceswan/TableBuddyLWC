@@ -67,6 +67,9 @@ export default class TableBuddyConfigurator extends LightningElement {
   _contextFieldValues = {};
   _mergeTokens = [];
   _expandedFieldName = null;
+  _objectSearchTimeout;
+  _contextObjectSearchTimeout;
+  _contextFieldValuesTimeout;
 
   // ===================== GETTERS =====================
 
@@ -155,6 +158,14 @@ export default class TableBuddyConfigurator extends LightningElement {
       entries.push({ objectName: obj, ...config, isDefault: false });
     }
     return entries;
+  }
+
+  get previewVisibleFieldNames() {
+    return this.fields.filter((f) => f.visible).map((f) => f.fieldName);
+  }
+
+  get previewFieldConfigs() {
+    return this.fields.filter((f) => f.visible);
   }
 
   get previewQueryString() {
@@ -404,7 +415,7 @@ export default class TableBuddyConfigurator extends LightningElement {
 
   // ===================== OBJECT SEARCH =====================
 
-  async handleObjectSearch(event) {
+  handleObjectSearch(event) {
     this.objectSearchTerm = event.detail.value;
     if (
       this.selectedObject &&
@@ -420,19 +431,21 @@ export default class TableBuddyConfigurator extends LightningElement {
       this.showObjectDropdown = false;
       return;
     }
-    try {
-      const results = await getSearchableObjects({
-        searchTerm: this.objectSearchTerm
-      });
-      this.objectSearchResults = results;
-      this.showObjectDropdown = true;
-    } catch (err) {
-      // Silently handle search errors
-      this.objectSearchResults = [];
-      this.showObjectDropdown = false;
-
-      console.debug('Object search error:', err);
-    }
+    clearTimeout(this._objectSearchTimeout);
+    // eslint-disable-next-line @lwc/lwc/no-async-operation
+    this._objectSearchTimeout = setTimeout(async () => {
+      try {
+        const results = await getSearchableObjects({
+          searchTerm: this.objectSearchTerm
+        });
+        this.objectSearchResults = results;
+        this.showObjectDropdown = true;
+      } catch (err) {
+        this.objectSearchResults = [];
+        this.showObjectDropdown = false;
+        console.debug('Object search error:', err);
+      }
+    }, 400);
   }
 
   handleObjectKeyUp(event) {
@@ -515,6 +528,11 @@ export default class TableBuddyConfigurator extends LightningElement {
       }
       return f;
     });
+    // Update preview column labels without a full data refresh
+    const previewEl = this.template.querySelector('c-table-buddy');
+    if (previewEl && typeof previewEl.updateColumnLabels === 'function') {
+      previewEl.updateColumnLabels(this.previewFieldConfigs);
+    }
   }
 
   handleFieldSortableChange(event) {
@@ -912,7 +930,11 @@ export default class TableBuddyConfigurator extends LightningElement {
     this.whereClause = event.detail.value;
     this._parseMergeTokens();
     if (this.contextRecordId && this._mergeTokens.length > 0) {
-      this._fetchContextFieldValues();
+      clearTimeout(this._contextFieldValuesTimeout);
+      // eslint-disable-next-line @lwc/lwc/no-async-operation
+      this._contextFieldValuesTimeout = setTimeout(() => {
+        this._fetchContextFieldValues();
+      }, 600);
     }
   }
 
@@ -948,7 +970,7 @@ export default class TableBuddyConfigurator extends LightningElement {
 
   // ===================== CONTEXT RECORD =====================
 
-  async handleContextObjectSearch(event) {
+  handleContextObjectSearch(event) {
     this.contextObjectSearchTerm = event.detail.value;
     if (this.contextObjectApiName) {
       this.contextObjectApiName = '';
@@ -961,19 +983,21 @@ export default class TableBuddyConfigurator extends LightningElement {
       this.showContextObjectDropdown = false;
       return;
     }
-    try {
-      const results = await getSearchableObjects({
-        searchTerm: this.contextObjectSearchTerm
-      });
-      this.contextObjectResults = results;
-      this.showContextObjectDropdown = true;
-    } catch (err) {
-      // Silently handle search errors
-      this.contextObjectResults = [];
-      this.showContextObjectDropdown = false;
-
-      console.debug('Context object search error:', err);
-    }
+    clearTimeout(this._contextObjectSearchTimeout);
+    // eslint-disable-next-line @lwc/lwc/no-async-operation
+    this._contextObjectSearchTimeout = setTimeout(async () => {
+      try {
+        const results = await getSearchableObjects({
+          searchTerm: this.contextObjectSearchTerm
+        });
+        this.contextObjectResults = results;
+        this.showContextObjectDropdown = true;
+      } catch (err) {
+        this.contextObjectResults = [];
+        this.showContextObjectDropdown = false;
+        console.debug('Context object search error:', err);
+      }
+    }, 400);
   }
 
   handleContextObjectKeyUp(event) {
@@ -1312,11 +1336,7 @@ export default class TableBuddyConfigurator extends LightningElement {
       this._contextFieldValues = result || {};
     } catch (error) {
       this._contextFieldValues = {};
-      this._showToast(
-        'Context Error',
-        error.body ? error.body.message : error.message,
-        'error'
-      );
+      console.debug('Context field values error:', error);
     }
   }
 

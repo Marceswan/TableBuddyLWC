@@ -902,7 +902,12 @@
             >
               {resolvedPreviewQueryString}
             </p>
-            <c-table-buddy key={_previewKey} title={configName}></c-table-buddy>
+            <c-table-buddy
+              key={_previewKey}
+              title={configName}
+              visible-field-names={previewVisibleFieldNames}
+              preview-field-configs={previewFieldConfigs}
+            ></c-table-buddy>
           </template>
           <template lwc:else>
             <div
