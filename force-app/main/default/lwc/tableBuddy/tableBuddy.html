@@ -6,9 +6,7 @@
 
   <!-- ===== Related List layout ===== -->
   <template lwc:if={isUsedAsRelatedList}>
-    <div
-      class="slds-page-header slds-page-header_record-home page-header slds-p-bottom_none"
-    >
+    <div class="slds-page-header slds-page-header_record-home page-header">
       <div class="slds-page-header__row slds-m-bottom_small">
         <div class="slds-page-header__col-title">
           <div class="slds-media">
@@ -37,27 +35,34 @@
 
         <div class="slds-page-header__col-actions">
           <div class="slds-page-header__controls">
-            <div class="slds-page-header__control">
-              <!-- Search -->
-              <template lwc:if={showSearch}>
-                <lightning-input
-                  class="search-input"
-                  variant="label-hidden"
-                  placeholder="Search..."
-                  onchange={handleSearch}
-                ></lightning-input>
-              </template>
-              <!-- Refresh -->
-              <template lwc:if={showRefresh}>
+            <!-- Search -->
+            <template lwc:if={showSearch}>
+              <div class="slds-page-header__control">
+                <div style="width: 200px">
+                  <lightning-input
+                    class="search-input"
+                    type="search"
+                    variant="label-hidden"
+                    placeholder="Search..."
+                    onchange={handleSearch}
+                  ></lightning-input>
+                </div>
+              </div>
+            </template>
+            <!-- Refresh -->
+            <template lwc:if={showRefresh}>
+              <div class="slds-page-header__control">
                 <lightning-button-icon
                   alternative-text="Refresh"
                   icon-name="utility:refresh"
                   variant="border-filled"
                   onclick={handleRefresh}
                 ></lightning-button-icon>
-              </template>
-              <!-- Table Actions -->
-              <template lwc:if={_hasTableActions}>
+              </div>
+            </template>
+            <!-- Table Actions -->
+            <template lwc:if={_hasTableActions}>
+              <div class="slds-page-header__control">
                 <lightning-button-group>
                   <template for:each={_tableActions} for:item="action">
                     <lightning-button
@@ -83,17 +88,15 @@
                     </lightning-button-menu>
                   </template>
                 </lightning-button-group>
-              </template>
-            </div>
+              </div>
+            </template>
           </div>
         </div>
       </div>
 
       <div class="slds-page-header__row slds-page-header__row_gutters">
         <div class="slds-page-header__col-details">
-          <ul
-            class="slds-page-header__detail-row slds-p-around_none page-header-detail"
-          >
+          <div class="page-header-detail">
             <div class={containerClass}>
               <template lwc:if={_showSpinner}>
                 <lightning-spinner
@@ -121,7 +124,7 @@
                 errors={saveErrors}
               ></c-table-buddy-datatable>
             </div>
-          </ul>
+          </div>
         </div>
       </div>
     </div>
