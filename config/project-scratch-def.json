@@ -1,0 +1,13 @@
+{
+  "orgName": "TableBuddy Dev",
+  "edition": "Developer",
+  "features": [],
+  "settings": {
+    "lightningExperienceSettings": {
+      "enableS1DesktopEnabled": true
+    },
+    "mobileSettings": {
+      "enableS1EncryptedStorage": false
+    }
+  }
+}
