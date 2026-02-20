@@ -1,0 +1,39 @@
+<template>
+  <c-table-buddy-message-service
+    boundary={tableBoundary}
+    onlookupconfigload={handleLookupConfigLoad}
+    onrefreshtablebuddy={handleReset}
+  ></c-table-buddy-message-service>
+
+  <c-table-buddy-editable-cell
+    table-boundary={tableBoundary}
+    original-value={value}
+    edit-cell-value-prop="value"
+    is-editable={isEditable}
+    row-key-attribute={rowKeyAttribute}
+    row-key-value={rowKeyValue}
+    object-api-name={objectApiName}
+    column-name={columnName}
+    field-api-name={fieldApiName}
+    change-event-name="change"
+    oncustomcellsetdraftvalue={handleSetDraftValue}
+    oncustomcellreset={handleReset}
+  >
+    <lightning-formatted-url
+      slot="displayCell"
+      name="lookup-display"
+      value={href}
+      label={cellDisplayValue}
+      target={target}
+    ></lightning-formatted-url>
+    <lightning-record-picker
+      slot="editCell"
+      name="lookup-edit"
+      label={fieldApiName}
+      variant="label-hidden"
+      object-api-name={referenceObjectApiName}
+      value={value}
+      onchange={handleSelected}
+    ></lightning-record-picker>
+  </c-table-buddy-editable-cell>
+</template>

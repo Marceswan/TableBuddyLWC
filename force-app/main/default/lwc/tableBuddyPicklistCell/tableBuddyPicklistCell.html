@@ -1,0 +1,36 @@
+<template>
+  <c-table-buddy-message-service
+    boundary={tableBoundary}
+    onpicklistconfigload={handlePicklistConfigLoad}
+    onrefreshtablebuddy={handleReset}
+  ></c-table-buddy-message-service>
+
+  <c-table-buddy-editable-cell
+    table-boundary={tableBoundary}
+    original-value={value}
+    edit-cell-value-prop="value"
+    is-editable={isEditable}
+    row-key-attribute={rowKeyAttribute}
+    row-key-value={rowKeyValue}
+    object-api-name={objectApiName}
+    column-name={columnName}
+    field-api-name={fieldApiName}
+    change-event-name="change"
+    oncustomcellsetdraftvalue={handleSetDraftValue}
+    oncustomcellreset={handleReset}
+  >
+    <lightning-formatted-text
+      slot="displayCell"
+      name="picklist-display"
+      value={cellDisplayValue}
+    ></lightning-formatted-text>
+    <lightning-combobox
+      slot="editCell"
+      name="picklist-edit"
+      variant="label-hidden"
+      value={value}
+      options={_picklistOptions}
+      onchange={handleSelected}
+    ></lightning-combobox>
+  </c-table-buddy-editable-cell>
+</template>
